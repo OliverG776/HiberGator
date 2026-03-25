@@ -1,47 +1,74 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
+
   return (
-    <div className="App"
-    style={{
-        backgroundColor: "#0021A5",
-        minHeight: "100vh",
-        color: "white"
-      }}
-    >
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <h1 style={styles.title}>Login</h1>
 
-      
+        <input type="text" placeholder="Username" style={styles.input} />
+        <input type="password" placeholder="Password" style={styles.input} />
 
-        {/*Create Account Header*/} 
-        {/*//Username label + input box*/}
-        <label>
-        Username: <input name="username" />
-        </label>
-        <br />
-        <br />
-
-        {/*//Password label + input box*/}
-        <label>
-         Password: <input name="password" />
-        </label>
-        <br />
-        <br />
-
-        {/*//Confirm Password label + input box*/}
-        <label>
-         Confirm Password: <input name="confirm_password" />
-        </label>
-        <br />
-        <br />
-
-        {/*//Login button*/}
-        <button>
-        Login
+        <button style={styles.button}>Login</button> 
+        <button style={styles.backButton} onClick={() => navigate("/")}>
+          Back to Dashboard
         </button>
-
+      </div>
     </div>
   );
 }
 
-export default App;
+const styles = {
+  page: {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f4f8fb",
+  },
+  container: {
+    backgroundColor: "white",
+    padding: "40px",
+    borderRadius: "16px",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+    width: "100%",
+    maxWidth: "400px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  },
+  title: {
+    textAlign: "center",
+    color: "#1b4332",
+    marginBottom: "10px",
+  },
+  input: {
+    padding: "12px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+  },
+  button: {
+    backgroundColor: "#2d6a4f",
+    color: "white",
+    border: "none",
+    padding: "12px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "16px",
+  },
+  backButton: {
+    backgroundColor: "#ccc",
+    color: "#222",
+    border: "none",
+    padding: "12px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "16px",
+  },
+};
+
+export default Login;

@@ -1,50 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./Dashboard";
+import Login from "./Login";
 
 function App() {
   return (
-    <div className="App"
-    style={{
-        backgroundColor: "#0021A5",
-        minHeight: "100vh",
-        color: "white"
-      }}
-    >
-
-      
-
-      {/*Create Account Header*/} 
-      <h1>Create Account:</h1>
-
-      <p>We are so cooked brah</p>
-
-        {/*//Username label + input box*/}
-        <label>
-        Username: <input name="username" />
-        </label>
-        <br />
-        <br />
-
-        {/*//Password label + input box*/}
-        <label>
-         Password: <input name="password" />
-        </label>
-        <br />
-        <br />
-
-        {/*//Confirm Password label + input box*/}
-        <label>
-         Confirm Password: <input name="confirm_password" />
-        </label>
-        <br />
-        <br />
-
-        {/*//Login button*/}
-        <button>
-        Login
-        </button>
-
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
   );
 }
 
