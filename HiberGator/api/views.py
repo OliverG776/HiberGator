@@ -14,6 +14,7 @@ except ImportError:
 
 MONGO_URI = 'mongodb+srv://parkercolby_db_user:Zdqx3XiFtWmxijoj@hibergator.8ngplxl.mongodb.net/'
 
+ADMIN_KEY = 'NeverShareThisKey'
 
 def get_user_collection():
     client_options = {
@@ -96,3 +97,23 @@ def check_login_credentials(username, password):
 def insert_user(username, password):
     collection = get_user_collection()
     result = collection.insert_one({"username": username, "password": password})
+
+def get_admin_collection():
+        client_options = {
+        'serverSelectionTimeoutMS': 5000,
+        'tls': True,
+    }
+
+    if certifi is not None:
+        client_options['tlsCAFile'] = certifi.where()
+
+    client = MongoClient(MONGO_URI, **client_options)
+    client.admin.command('ping')
+    db = client['Sleep_Tracker']
+    return db['Admin']
+
+def check_admin(username, password, admin_key):
+   collection = get_admin_collection()
+    result = collection.find_one({'username': username, 'password': password})
+
+    return result and admin_key == ADMIN_KEY
