@@ -186,7 +186,7 @@ def login(request):
         if not username or not password:
             return JsonResponse({'error': 'Username and password required'}, status=400)
 
-        if check_user_existence(username, password):
+        if get_admin_collection().find_one({'username': username, 'password': password}) or get_user_collection().find_one({'username': username, 'password': password}):
             return JsonResponse({'message': 'Login successful'}, status=200)
         else:
             return JsonResponse({'error': 'Invalid username or password'}, status=401)

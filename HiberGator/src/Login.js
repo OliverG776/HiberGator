@@ -16,7 +16,7 @@ function Login() {
     console.log("Login form values:", { username, password });
 
     try {
-      const response = await fetch("/api/check_user_existence/", {
+      const response = await fetch("/api/login/", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
