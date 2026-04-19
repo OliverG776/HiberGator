@@ -13,8 +13,6 @@ function Login() {
       return;
     }
 
-    console.log("Login form values:", { username, password });
-
     try {
       const response = await fetch("/api/login/", {
         method: 'POST',
@@ -31,6 +29,7 @@ function Login() {
 
       if (response.ok) {
         alert(data.message);
+        localStorage.setItem("username", username);
         if (data.role == "admin") {
           navigate("/AdminDashboard");
         } else {

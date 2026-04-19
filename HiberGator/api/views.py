@@ -104,6 +104,7 @@ def insert_user(username, password):
     collection = get_user_collection()
     result = collection.insert_one({"username": username, "password": password})
 
+
 def get_admin_collection():
     client_options = {
         'serverSelectionTimeoutMS': 5000,
@@ -299,5 +300,75 @@ def change_user_password(request):
                     status=500,
                 )
             return JsonResponse({'error': f'Database error: {error_message}'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def update_profile(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            
+            collection = get_user_collection()
+            user = collection.find_one({'username': username})
+
+            updated_values = {}
+
+            if 'age' in data:
+                updated_values['age'] = data['age']
+            if 'sex' in data:
+                updated_values['sex'] = data['sex']
+            if 'weight' in data:
+                updated_values['weight'] = data['weight']
+            if 'height' in data:
+                updated_values['height'] = data['height']
+
+            if 'new_password' in data and data.get('new_password'):
+                new_password = data['new_password']
+                if not check_proper_password(new_password):
+                    return JsonResponse({'error': 'Password must be at least 6 characters, contain at least 3 digits and one special character'}, status=400)
+                if new_password == user['password']:
+                    return JsonResponse({'error': 'New password cannot be the same as the old password'}, status=400)
+                updated_values['password'] = new_password
+            
+            if not updated_values:
+                return JsonResponse({'error': 'No valid fields to update'}, status=400)
+            
+            collection.update_one({'username': username}, {'$set': updated_values})
+            
+            return JsonResponse({'message': 'Profile updated successfully'}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def get_profile(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+
+            if not username:
+                return JsonResponse({'error': 'Username required'}, status=400)
+
+            user = get_user_collection().find_one({'username': username})
+
+            if not user:
+                user = get_admin_collection().find_one({'username': username})
+
+            if not user:
+                return JsonResponse({'error': 'User not found'}, status=404)
+
+            return JsonResponse({
+                'username': user['username'],
+                'age': user.get('age', ''),
+                'sex': user.get('sex', ''),
+                'height': user.get('height', ''),
+                'weight': user.get('weight', ''),
+            }, status=200)
+        except Exception as e:
+            return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)

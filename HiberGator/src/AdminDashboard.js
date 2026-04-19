@@ -101,7 +101,7 @@ function AdminDashboard() {
 
 
         <div style={styles.buttonContainer}>
-          <button style={styles.logoutButton} onClick={() => navigate("/")}>
+          <button style={styles.logoutButton} onClick={() => {localStorage.removeItem("username"); navigate("/")}}>
             Logout
           </button>
         </div>
