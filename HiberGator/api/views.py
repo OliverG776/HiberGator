@@ -115,5 +115,5 @@ def get_admin_collection():
 def check_admin(username, password, admin_key):
    collection = get_admin_collection()
    admin_existence = collection.find_one({'username': username})
-    return admin_existence is None and check_proper_username(username) and check_proper_password(password) and admin_key == ADMIN_KEY
+   return admin_existence is None and check_proper_username(username) and check_proper_password(password) and admin_key == ADMIN_KEY
     
