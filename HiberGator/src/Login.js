@@ -1,18 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./App.css";
 
 function Login() {
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
+      alert("Username and password are required");
+      return;
+    }
+
+    console.log("Login form values:", { username, password });
+
+    try {
+      const response = await fetch("/api/check_user_existence/", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const contentType = response.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await response.json()
+        : { error: await response.text() };
+
+      if (response.ok) {
+        alert(data.message);
+        navigate("/Dashboard");
+      } else {
+        alert(data.error || "Invalid username or password");
+      }
+  } catch (error) {
+      alert(`Error during login: ${error.message}`);
+    }
+  };
 
   return (
     <div style={styles.page}>
       <div style={styles.container}>
         <h1 style={styles.title}>Login</h1>
 
-        <input type="text" placeholder="Username" style={styles.input} />
-        <input type="password" placeholder="Password" style={styles.input} />
+        <input
+          type="text"
+          placeholder="Username"
+          style={styles.input}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          style={styles.input}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-        <button style={styles.button} onClick={() => navigate("/Dashboard")}>Login</button> 
+        <button style={styles.button} onClick={handleLogin}>
+          Login
+        </button>
         <button style={styles.backButton} onClick={() => navigate("/Create_Acc")}>
           Create Account
         </button>

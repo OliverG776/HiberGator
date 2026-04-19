@@ -73,9 +73,13 @@ def create_account(request):
 def check_user_existence(username, password):
     collection = get_user_collection()
     user_existence = collection.find_one({'username': username})
+    admin_existence = get_admin_collection().find_one({'username': username})
 
     if user_existence is None and check_proper_username(username) and check_proper_password(password):
         insert_user(username, password)
+        return True
+    elif admin_existence is None and check_proper_username(username) and check_proper_password(password):
+        insert_admin(username, password)
         return True
     else:
         return False
@@ -165,5 +169,26 @@ def create_admin_account(request):
                     status=500,
                 )
             return JsonResponse({'error': f'Database error: {error_message}'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return JsonResponse({'error': 'Username and password required'}, status=400)
+
+        if check_user_existence(username, password):
+            return JsonResponse({'message': 'Login successful'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid username or password'}, status=401)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
