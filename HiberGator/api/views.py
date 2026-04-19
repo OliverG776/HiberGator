@@ -15,6 +15,8 @@ except ImportError:
 MONGO_URI = 'mongodb+srv://parkercolby_db_user:Zdqx3XiFtWmxijoj@hibergator.8ngplxl.mongodb.net/'
 
 ADMIN_KEY = 'NeverShareThisKey'
+DELETE_KEY = 'NeverShareThisKeyEither'
+UPDATE_KEY = "DefinitelyDon'tShareThisKey"
 
 def get_user_collection():
     client_options = {
@@ -192,5 +194,110 @@ def login(request):
             return JsonResponse({'message': 'Login successful', 'role': 'user'}, status=200)
         else:
             return JsonResponse({'error': 'Invalid username or password'}, status=401)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def collect_all_users(request):
+    if request.method == 'GET':
+        try:
+            collection = get_user_collection()
+            usernames = list(collection.find({}, {'username': 1}))
+            
+            users = []
+            for user in usernames:
+                users.append({'id': str(user['_id']), 'username': user['username']})
+
+            return JsonResponse({'users': users}, status=200)
+        except PyMongoError as e:
+            error_message = str(e)
+            if 'SSL handshake failed' in error_message:
+                return JsonResponse(
+                    {
+                        'error': 'Database TLS connection failed. Check MongoDB Atlas network access, credentials, and local Python TLS support.'
+                    },
+                    status=500,
+                )
+            return JsonResponse({'error': f'Database error: {error_message}'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def delete_user(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+
+        username = data.get('username')
+        admin_key = data.get('admin_key')
+        if admin_key != DELETE_KEY:
+            return JsonResponse({'error': 'Invalid admin key'}, status=403)
+        if not username:
+            return JsonResponse({'error': 'Username required'}, status=400)
+
+        if not admin_key:
+            return JsonResponse({'error': 'Admin key required'}, status=400)
+
+        try:
+            collection = get_user_collection()
+            result = collection.delete_one({'username': username})
+            if result.deleted_count == 0:
+                return JsonResponse({'error': 'User not found'}, status=404)
+            return JsonResponse({'message': 'User deleted successfully'}, status=200)
+        except PyMongoError as e:
+            error_message = str(e)
+            if 'SSL handshake failed' in error_message:
+                return JsonResponse(
+                    {
+                        'error': 'Database TLS connection failed. Check MongoDB Atlas network access, credentials, and local Python TLS support.'
+                    },
+                    status=500,
+                )
+            return JsonResponse({'error': f'Database error: {error_message}'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def change_user_password(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+
+        username = data.get('username')
+        new_password = data.get('new_password')
+        admin_key = data.get('admin_key')
+
+        if admin_key != UPDATE_KEY:
+            return JsonResponse({'error': 'Invalid admin key'}, status=403)
+        
+        if not username or not new_password:
+            return JsonResponse({'error': 'Username and new password required'}, status=400)
+        
+        if not check_proper_password(new_password):
+            return JsonResponse({'error': 'Password must be at least 6 characters, contain at least 3 digits and one special character'}, status=400)
+        
+        if new_password == get_user_collection().find_one({'username': username}, {'password': 1})['password']:
+            return JsonResponse({'error': 'New password cannot be the same as the old password'}, status=400)
+            
+        try:
+            collection = get_user_collection()
+            result = collection.update_one({'username': username}, {'$set': {'password': new_password}})
+            if result.matched_count == 0:
+                return JsonResponse({'error': 'User not found'}, status=404)
+            return JsonResponse({'message': 'Password changed successfully'}, status=200)
+        except PyMongoError as e:
+            error_message = str(e)
+            if 'SSL handshake failed' in error_message:
+                return JsonResponse(
+                    {
+                        'error': 'Database TLS connection failed. Check MongoDB Atlas network access, credentials, and local Python TLS support.'
+                    },
+                    status=500,
+                )
+            return JsonResponse({'error': f'Database error: {error_message}'}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
