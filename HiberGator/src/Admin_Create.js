@@ -8,22 +8,23 @@ function Create_Acc() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [adminKey, setAdminKey] = useState("");
 
   const handleCreateAccount = async () => {
-    if (!username.trim() || !password.trim()) {
-      alert("Username and password are required");
+    if (!username.trim() || !password.trim() || !adminKey.trim()) {
+      alert("Username, password and admin key are required");
       return;
     }
 
-    console.log("Create account form values:", { username, password });
+    console.log("Create account form values:", { username, password, adminKey });
 
     try {
-      const response = await fetch("/api/create_account/", {
+      const response = await fetch("/api/create_admin_account/", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, adminKey }),
       });
 
       const contentType = response.headers.get("content-type") || "";
@@ -61,6 +62,14 @@ function Create_Acc() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <input 
+          type="text" 
+          placeholder="Admin Key" 
+          style={styles.input} 
+          value={adminKey}
+          onChange={(e) => setAdminKey(e.target.value)}
+        />
+
 
         <button style={styles.button} onClick={handleCreateAccount}>
           Create Account
@@ -68,8 +77,8 @@ function Create_Acc() {
         <button style={styles.backButton} onClick={() => navigate("/")}>
           Back to Login
         </button>
-        <button style={styles.backButton} onClick={() => navigate("/Admin_Create")}>
-          Create Admin Account
+        <button style={styles.backButton} onClick={() => navigate("/Create_Acc")}>
+          Back to User Account Creation
         </button>
       </div>
     </div>
