@@ -52,7 +52,7 @@ def create_account(request):
         
         try:
             collection = get_user_collection()
-            if collection.find_one({'username': username}):
+            if collection.find_one({'username': username}) or get_admin_collection().find_one({'username': username}):
                 return JsonResponse({'error': 'Username already exists'}, status=400)
 
             insert_user(username, password)
