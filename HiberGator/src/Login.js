@@ -31,7 +31,11 @@ function Login() {
 
       if (response.ok) {
         alert(data.message);
-        navigate("/Dashboard");
+        if (response.role === "admin") {
+
+        } else {
+          navigate("/Dashboard");
+        }
       } else {
         alert(data.error || "Invalid username or password");
       }
