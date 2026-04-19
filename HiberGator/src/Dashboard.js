@@ -29,8 +29,29 @@ function Dashboard() {
             Go to Login
           </button>
         </div>
+
+        <div style={styles.buttonContainer}>
+          <button style={styles.profileButton} onClick={() => navigate("/Profile")}>
+            Profile
+          </button>
+        </div>
+          
+
+        <div style={styles.buttonContainer}>
+          <button style={styles.surveyButton} onClick={() => navigate("/Survey")}>
+            Survey
+          </button>
+        </div>
+
+        <div style={styles.buttonContainer}>
+          <button style={styles.logoutButton} onClick={() => navigate("/")}>
+            Logout
+          </button>
+        </div>
+
+        
+        </div>
       </div>
-    </div>
   );
 }
 
@@ -50,6 +71,7 @@ const styles = {
     borderRadius: "16px",
     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
     padding: "40px",
+    position: "relative",
   },
   title: {
     fontSize: "36px",
@@ -100,6 +122,48 @@ const styles = {
     borderRadius: "8px",
     cursor: "pointer",
   },
+  profileButton: {
+    backgroundColor: "#0c33a9",
+    color: "white",
+    border: "none",
+    padding: "12px 24px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    position: "absolute",
+    top: "20px",
+    right: "20px",
+    width: "100px",
+  },
+  logoutButton: {
+    backgroundColor: "#9b1e08",
+    color: "white",
+    border: "none",
+    padding: "12px 24px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    position: "absolute",
+    top: "70px",
+    right: "20px",
+    textAlign: "center",
+    width: "100px",
+  },
+  surveyButton: {
+    backgroundColor: "#0c33a9",
+    color: "white",
+    border: "none",
+    padding: "12px 24px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    position: "absolute",
+    top: "20px",
+    left: "20px",
+    textAlign: "center",
+    width: "100px",
+  }
+
 };
 
 export default Dashboard;
