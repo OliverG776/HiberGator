@@ -8,15 +8,15 @@ function Create_Acc() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [adminKey, setAdminKey] = useState("");
+  const [admin_key, setAdminKey] = useState("");
 
   const handleCreateAccount = async () => {
-    if (!username.trim() || !password.trim() || !adminKey.trim()) {
+    if (!username.trim() || !password.trim() || !admin_key.trim()) {
       alert("Username, password and admin key are required");
       return;
     }
 
-    console.log("Create account form values:", { username, password, adminKey });
+    console.log("Create account form values:", { username, password, admin_key });
 
     try {
       const response = await fetch("/api/create_admin_account/", {
@@ -24,7 +24,7 @@ function Create_Acc() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password, adminKey }),
+        body: JSON.stringify({ username, password, admin_key }),
       });
 
       const contentType = response.headers.get("content-type") || "";
@@ -66,7 +66,7 @@ function Create_Acc() {
           type="text" 
           placeholder="Admin Key" 
           style={styles.input} 
-          value={adminKey}
+          value={admin_key}
           onChange={(e) => setAdminKey(e.target.value)}
         />
 

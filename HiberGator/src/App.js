@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import Login from "./Login";
 import Create_Acc from "./Create_Acc";
+import Admin_Create from "./Admin_Create";
 
 function App() {
   return (

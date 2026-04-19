@@ -99,7 +99,7 @@ def insert_user(username, password):
     result = collection.insert_one({"username": username, "password": password})
 
 def get_admin_collection():
-        client_options = {
+    client_options = {
         'serverSelectionTimeoutMS': 5000,
         'tls': True,
     }
@@ -111,6 +111,10 @@ def get_admin_collection():
     client.admin.command('ping')
     db = client['Sleep_Tracker']
     return db['Admin']
+
+def insert_admin(username, password):
+    collection = get_admin_collection()
+    result = collection.insert_one({"username": username, "password": password})
 
 def check_admin(username, password, admin_key):
    collection = get_admin_collection()
@@ -140,13 +144,16 @@ def create_admin_account(request):
         
         if admin_key != ADMIN_KEY:
             return JsonResponse({'error': 'Invalid admin key'}, status=403)
-            
+
         try:
-            collection = get_admin_collection()
+            collection = get_user_collection()
+            admin_collection = get_admin_collection()
             if collection.find_one({'username': username}):
                 return JsonResponse({'error': 'Username already exists'}, status=400)
+            if admin_collection.find_one({'username': username}):
+                return JsonResponse({'error': 'Username already exists'}, status=400)
 
-            insert_user(username, password)
+            insert_admin(username, password)
             return JsonResponse({'message': 'Account created successfully'}, status=201)
         except PyMongoError as e:
             error_message = str(e)
