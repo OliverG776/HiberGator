@@ -31,7 +31,7 @@ function Login() {
 
       if (response.ok) {
         alert(data.message);
-        if (response.role === "admin") {
+        if (data.role === "admin") {
 
         } else {
           navigate("/Dashboard");
