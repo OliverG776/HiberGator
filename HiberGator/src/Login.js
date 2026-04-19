@@ -29,7 +29,7 @@ function Login() {
         ? await response.json()
         : { error: await response.text() };
 
-      if (response.ok) {
+       if (response.ok) {
         alert(data.message);
         if (data.role == "admin") {
           navigate("/AdminDashboard");

@@ -25,6 +25,12 @@ function Dashboard() {
         </div>
 
         <div style={styles.buttonContainer}>
+          <button style={styles.button} onClick={() => navigate("/")}>
+            Go to Login
+          </button>
+        </div>
+
+        <div style={styles.buttonContainer}>
           <button style={styles.profileButton} onClick={() => navigate("/Profile")}>
             Profile
           </button>
