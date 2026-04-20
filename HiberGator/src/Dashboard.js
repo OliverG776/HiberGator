@@ -60,12 +60,11 @@ function Dashboard() {
         setError("Failed to fetch sleep data: " + data.error);
         setSleepData([]);
       } else {
-        setSleepData(
-         (data.sleep_data || []).map((entry) => ({
-            date: entry.date,
-            hours: Number(entry.hours ?? entry.sleep_hours ?? entry.sleepHours),
-        }))
-);
+        const formatted = (data.sleep_data || []).map((entry) => ({
+          date: entry.date,
+          hours: Number(entry.sleepHours ?? entry.sleep_hours ?? entry.hours),
+        })).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-7);
+        setSleepData(formatted);
       }
     } catch (error) {
       setError("Failed to fetch sleep data: " + error.message);
