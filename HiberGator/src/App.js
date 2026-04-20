@@ -7,6 +7,7 @@ import Admin_Create from "./Admin_Create";
 import AdminDashboard from "./AdminDashboard";
 import Profile from "./Profile";
 import Survey from "./Survey";
+import Survey2 from "./Survey2";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/Survey" element={<Survey />} />
+        <Route path="/Survey2" element={<Survey2 />} />
       </Routes>
     </Router>
   );

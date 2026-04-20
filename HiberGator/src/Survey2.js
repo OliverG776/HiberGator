@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 
-function Survey() {
+function Survey2() {
     const navigate = useNavigate();
     const [surveyAnswer1, setSurveyAnswer1] = useState("");
     const [surveyAnswer2, setSurveyAnswer2] = useState("");
     const [surveyAnswer3, setSurveyAnswer3] = useState("");
     const [surveyAnswer4, setSurveyAnswer4] = useState("");
+    const [currentDate, setCurrentDate] = useState("");
     //These all save responses (I believe, copied the login logic)
     //Colby go through and manipulate these if yk how to save the responses to the database.
 
@@ -20,25 +21,24 @@ function Survey() {
                 <h1 style={styles.title}>Survey</h1>
                 <div style={styles.inputContainer}>
                     <div> 
-                        <label>1. What time do you go to sleep at night?</label>
+                        <label>Please enter the amount of sleep you got for each date (that you can remember):</label>
+                    </div>
+                    <div> 
+                        <label>Enter a day of the week:</label>
                     </div>
                     <select 
-                        value={surveyAnswer1}
-                        onChange={(e) => setSurveyAnswer1(e.target.value)}
+                        value={currentDate}
+                        onChange={(e) => setCurrentDate(e.target.value)}
                         style={styles.input}
                     >
                         <option value="">Select an answer</option>
-                        <option value="Before 8 PM">Before 8 PM</option>
-                        <option value="8 PM">8 PM</option>
-                        <option value="9 PM">9 PM</option>
-                        <option value="10 PM">10 PM</option>
-                        <option value="11 PM">11 PM</option>
-                        <option value="12 AM">12 AM</option>
-                        <option value="1 AM">1 AM</option>
-                        <option value="2 AM">2 AM</option>
-                        <option value="3 AM">3 AM</option>
-                        <option value="4 AM">4 AM</option>
-                        <option value="After 4 AM">After 4 AM</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
                     </select>
                     
                     <div> 
@@ -94,10 +94,10 @@ function Survey() {
                     </button>
 
                     <button style={styles.finishButton} 
-                            onClick={() => navigate("/Survey2")}
+                            onClick={() => navigate("/Dashboard")}
                             disabled={!surveyComplete}
                             >
-                        Continue Survey!
+                        Complete Survey!
                     </button>
                 </div>
             </div>
@@ -202,4 +202,4 @@ const styles = {
  
 };
 
-export default Survey;
+export default Survey2;
