@@ -5,9 +5,9 @@ import "./App.css";
 function Survey2() {
     const navigate = useNavigate();
     const [currentDate, setCurrentDate] = useState("");
-    const[mondayAnswer, setMondayAnswer] = useState(false);
     const [sleepHours, setSleepHours] = useState("");
     const [sleepByDate, setSleepByDate] = useState({});
+    const surveyComplete = sleepHours && currentDate;
     // const[dateResponses, setDateResponses] = useState({
     //     currentDate: "",
     //     dayAnswers: {
@@ -28,18 +28,31 @@ function Survey2() {
     //Colby go through and manipulate these if yk how to save the responses to the database.
 
     //Prevents the user from submitting the surveyw without answering all questions
-    const surveyComplete = sleepHours && currentDate;
-    const handleSubmitDate = () => {
+    const handleSubmitDate = async () => {
+        const username = localStorage.getItem("username");
+
         if(!currentDate || !sleepHours) {
             return;
         }
-        else {
-            setSleepByDate((prev) => ({
-                ...prev,
-                [currentDate]: sleepHours,
-            }));
+        
+        try{
+            const response = await fetch("/api/save_sleep_data/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, date: currentDate, sleepHours: Number(sleepHours) }),
+            });
+            const data = await response.json();
+
+            if(response.ok) {
+                alert(data.message);
+                setSleepByDate((prev) => ({ ...prev, [currentDate]: Number(sleepHours) }));
+            }else {
+                alert(data.error || "Failed to save sleep data");
+            } 
+        } catch (error) {
+            alert("Server error while saving sleep data: " + error.message);
         }
-    }
+    };
 
     return (
         <div style={styles.page}>
@@ -72,13 +85,13 @@ function Survey2() {
                         style={styles.input}
                     >
                         <option value="">Select an answer</option>
-                        <option value="Less than 4 hours">Less than 4 hours</option>
-                        <option value="4 hours">4 hours</option>
-                        <option value="5 hours">5 hours</option>
-                        <option value="6 hours">6 hours</option>
-                        <option value="7 hours">7 hours</option>
-                        <option value="8 hours">8 hours</option>
-                        <option value="9 or more hours">9 or more hours</option>
+                        <option value="3">Less than 4 hours</option>
+                        <option value="4">4 hours</option>
+                        <option value="5">5 hours</option>
+                        <option value="6">6 hours</option>
+                        <option value="7">7 hours</option>
+                        <option value="8">8 hours</option>
+                        <option value="9">9 or more hours</option>
                     </select>
                     <button style = {styles.submitButton} disabled = {!surveyComplete} onClick = {handleSubmitDate}>
 

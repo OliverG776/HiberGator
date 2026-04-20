@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./App.css";
@@ -42,16 +42,41 @@ function SleepGraph({sleepData}) {
 
 function Dashboard() {
   const navigate = useNavigate();
-  const exampleSleepData = [
-    {date: "Mon", hours: 6 },
-    {date: "Tue", hours: 7 },
-    {date: "Wed", hours: 6 },
-    {date: "Thu", hours: 7 },
-    {date: "Fri", hours: 6 },
-    {date: "Sat", hours: 7 },
-    {date: "Sun", hours: 6 },
-  ];
 
+  const [sleepData, setSleepData] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const getSleepData = async () => {
+    const username = localStorage.getItem("username");
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch(`/api/get_sleep_data/?username=${encodeURIComponent(username)}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError("Failed to fetch sleep data: " + data.error);
+        setSleepData([]);
+      } else {
+        setSleepData(
+         (data.sleep_data || []).map((entry) => ({
+            date: entry.date,
+            hours: Number(entry.hours ?? entry.sleep_hours ?? entry.sleepHours),
+        }))
+);
+      }
+    } catch (error) {
+      setError("Failed to fetch sleep data: " + error.message);
+      setSleepData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getSleepData();
+  }, []);
 
   
 
@@ -66,7 +91,14 @@ function Dashboard() {
         <div style={styles.grid}>
           <div style={styles.card}>
             <h2 style={styles.cardTitle}>Sleep History</h2>
-            <SleepGraph sleepData={exampleSleepData} />
+              {loading && <p style={styles.cardText}>Loading sleep data... </p>}
+              {!loading && error && <p style={styles.errorText}>{error}</p>}
+              {!loading && !error && sleepData.length > 0 && (
+                <SleepGraph sleepData={sleepData} />
+              )}
+              {!loading && !error && sleepData.length === 0 && (
+                <p style={styles.cardText}>No sleep data available. Please complete the survey to see your sleep history.</p>
+              )}
           </div>
         </div>
 
@@ -201,7 +233,12 @@ const styles = {
     left: "20px",
     textAlign: "center",
     width: "100px",
-  }
+  }, errorText: {
+  fontSize: "16px",
+  color: "#9b1e08",
+  textAlign: "center",
+  fontWeight: "bold",
+},
 };
 
 export default Dashboard;

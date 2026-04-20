@@ -5,6 +5,7 @@ from pymongo.errors import PyMongoError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from datetime import datetime
 
 try:
     certifi = importlib.import_module('certifi')
@@ -372,3 +373,67 @@ def get_profile(request):
             return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def save_sleep_data(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            sleep_data = data.get('sleep_data')
+            date = data.get('date')
+            sleepHours = data.get('sleepHours')
+
+            if not username or not date or  sleepHours is None:
+                return JsonResponse({'error': 'Username, date, and sleep hours required'}, status=400)
+
+            try:
+                parsed_date = datetime.strptime(date, '%Y-%m-%d')
+            except ValueError:
+                return JsonResponse({'error': 'Invalid date format. Use YYYY-MM-DD'}, status=400)
+
+            day_name = parsed_date.strftime('%A')
+            collection = get_user_collection()
+            user = collection.find_one({'username': username})
+
+            if not user:
+                return JsonResponse({'error': 'User not found'}, status=404)
+
+            update_field = f"sleep_data.{day_name}.{date}"
+
+            collection.update_one({'username': username}, {'$set': {update_field: sleepHours}})
+            
+            return JsonResponse({'message': 'Sleep data saved successfully', "day": day_name, "date": date, "sleepHours": sleepHours}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def get_sleep_data(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        username = request.GET.get('username')
+        if not username:
+            return JsonResponse({'error': 'Username required'}, status=400)
+
+        collection = get_user_collection()
+        user = collection.find_one({'username': username})
+
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+
+        sleep_data = user.get('sleep_data', {})
+        formatted_sleep_data = []
+        
+        for day_name, dates_dict, in sleep_data.items():
+            if isinstance(dates_dict, dict):
+                for date, hours in dates_dict.items():
+                    formatted_sleep_data.append({'day': day_name, 'date': date, 'sleepHours': hours})
+        formatted_sleep_data.sort(key=lambda entry: entry['date'])            
+        return JsonResponse({'sleep_data': formatted_sleep_data}, status=200)
+
+    except Exception as e:
+        return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
