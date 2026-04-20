@@ -1,11 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 import "./App.css";
+
 
 // Use / for login, as it is the "home page"
 
 function Dashboard() {
   const navigate = useNavigate();
+
+
+  
 
   return (
     <div style={styles.page}>
