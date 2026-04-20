@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from api.views import create_account, create_admin_account, login, collect_all_users, delete_user, change_user_password, update_profile, get_profile, save_sleep_data, get_sleep_data
+from api.views import create_account, create_admin_account, login, collect_all_users, delete_user, change_user_password, update_profile, get_profile, save_sleep_data, get_sleep_data, generate_recommendation
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,4 +30,5 @@ urlpatterns = [
     path('api/get_profile/', get_profile, name='get_profile'),
     path('api/save_sleep_data/', save_sleep_data, name='save_sleep_data'),
     path('api/get_sleep_data/', get_sleep_data, name='get_sleep_data'),
+    path('api/generate_recommendation/', generate_recommendation, name='generate_recommendation'),
 ]

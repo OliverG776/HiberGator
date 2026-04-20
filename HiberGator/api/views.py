@@ -437,3 +437,92 @@ def get_sleep_data(request):
 
     except Exception as e:
         return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
+
+def get_sleep_range(age):
+    if 13 <= age <= 17:
+        return 8, 10
+    elif 18 <= age <= 60:
+        return 7, None
+    elif 61 <= age <= 64:
+        return 7, 9
+    elif age >= 65:
+        return 7, 8
+    else:
+        return None, None
+
+@csrf_exempt
+def generate_recommendation(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        username = data.get('username')
+
+        if not username:
+            return JsonResponse({'error': 'Username required'}, status=400)
+
+        collection = get_user_collection()
+        user = collection.find_one({'username': username})
+
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+
+        age = user.get('age')
+        if age is None:
+            return JsonResponse({'error': 'Age information is required to generate recommendations'}, status=400)
+        
+        try:
+            age = int(age)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid age format. Age must be a number'}, status=400)
+
+        sleep_entries = user.get('sleep_data', [])
+
+        if not sleep_entries:
+            return JsonResponse({'error': 'No sleep data available to generate recommendations'}, status=404)
+        
+        entries = []
+        for day_name, date in sleep_entries.items():
+            if isinstance(date, dict):
+                for date_str, hours in date.items():
+                    entries.append({'day': day_name, 'date': date_str, 'sleepHours': hours})
+        entries.sort(key=lambda entry: entry['date'])
+        week = entries[-7:]
+       
+        hours = []
+        for entry in week:
+            sleepHours = entry.get('sleepHours')
+            if sleepHours is not None:
+                try:
+                    hours.append(float(sleepHours))
+                except ValueError:
+                    continue
+        if not hours:
+            return JsonResponse({'error': 'No valid sleep hours found in the last week'}, status=404)
+
+        avg_sleep = sum(hours) / len(hours)
+
+        min_sleep, max_sleep = get_sleep_range(age)
+
+        if min_sleep is None and max_sleep is None:
+            return JsonResponse({'error': 'No sleep recommendations available for this age'}, status=400)
+        
+        if max_sleep is None:
+            if avg_sleep < min_sleep:
+                recommendation = f"Based on your average sleep of {avg_sleep:.1f} hours, we recommend aiming for at least {min_sleep} hours of sleep per night."
+            else:
+                recommendation = f"Your average sleep of {avg_sleep:.1f} hours meets the recommended minimum of {min_sleep} hours. Keep it up!"
+
+        else:
+                if avg_sleep < min_sleep:
+                    recommendation = f"Based on your average sleep of {avg_sleep:.1f} hours, we recommend aiming for at least {min_sleep} hours of sleep per night."
+                elif avg_sleep > max_sleep:
+                    recommendation = f"Based on your average sleep of {avg_sleep:.1f} hours, we recommend aiming for no more than {max_sleep} hours of sleep per night."
+                else:
+                    recommendation = f"Your average sleep of {avg_sleep:.1f} hours is within the recommended range of {min_sleep}-{max_sleep} hours. Great job!"
+        return JsonResponse({'recommendation': recommendation, "avg_sleep": avg_sleep, "entries_used": len(week)}, status=200)            
+
+
+    except Exception as e:
+        return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)

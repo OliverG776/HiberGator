@@ -47,6 +47,10 @@ function Dashboard() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [recommendation, setRecommendation] = useState("");
+  const [recommendationError, setRecommendationError] = useState("");
+  const [loadingRecommendation, setLoadingRecommendation] = useState(false);
+
   const getSleepData = async () => {
     const username = localStorage.getItem("username");
     try {
@@ -73,6 +77,36 @@ function Dashboard() {
       setLoading(false);
     }
   };
+
+  const handleGenerateRecommendation = async () => {
+    const username = localStorage.getItem("username");
+    try {
+      setLoadingRecommendation(true);
+      setRecommendation("");
+      setRecommendationError("");
+
+      const response = await fetch("/api/generate_recommendation/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRecommendation("");
+        setRecommendationError("Failed to generate recommendation: " + data.error);
+      } else {
+        setRecommendation(data.recommendation);
+        setRecommendationError("");
+      }
+    } catch (error) {
+      setRecommendation("");
+      setRecommendationError("Failed to generate recommendation: " + error.message);
+    } finally {
+      setLoadingRecommendation(false);
+    }
+  };
+
   useEffect(() => {
     getSleepData();
   }, []);
@@ -98,6 +132,17 @@ function Dashboard() {
               {!loading && !error && sleepData.length === 0 && (
                 <p style={styles.cardText}>No sleep data available. Please complete the survey to see your sleep history.</p>
               )}
+
+              {!loading && !error && sleepData.length > 0 && (
+                <div style={styles.recommendationSection}>
+                  <button style={styles.recommendationButton} onClick={handleGenerateRecommendation} disabled={loadingRecommendation}>
+                    {loadingRecommendation ? "Generating..." : "Get Sleep Recommendation"}
+                  </button>
+                  {recommendationError && <p style={styles.errorText}>{recommendationError}</p>}
+                  {recommendation && <p style={styles.recommendationText}>{recommendation}</p>}
+                </div>
+              )}
+
           </div>
         </div>
 
@@ -237,7 +282,30 @@ const styles = {
   color: "#9b1e08",
   textAlign: "center",
   fontWeight: "bold",
-},
+},  recommendationSection: {
+    marginTop: "20px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "12px",
+  },
+  recommendationButton: {
+    backgroundColor: "#0c33a9",
+    color: "white",
+    border: "none",
+    padding: "12px 24px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    cursor: "pointer",
+  },
+  recommendationText: {
+    fontSize: "16px",
+    color: "#2b2b2b",
+    textAlign: "center",
+    fontWeight: "500",
+    lineHeight: "1.5",
+    marginTop: "10px",
+  },
 };
 
 export default Dashboard;
