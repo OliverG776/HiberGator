@@ -4,16 +4,42 @@ import "./App.css";
 
 function Survey2() {
     const navigate = useNavigate();
-    const [surveyAnswer1, setSurveyAnswer1] = useState("");
-    const [surveyAnswer2, setSurveyAnswer2] = useState("");
-    const [surveyAnswer3, setSurveyAnswer3] = useState("");
-    const [surveyAnswer4, setSurveyAnswer4] = useState("");
     const [currentDate, setCurrentDate] = useState("");
+    const[mondayAnswer, setMondayAnswer] = useState(false);
+    const [sleepHours, setSleepHours] = useState("");
+    const [sleepByDate, setSleepByDate] = useState({});
+    // const[dateResponses, setDateResponses] = useState({
+    //     currentDate: "",
+    //     dayAnswers: {
+    //         monday: false,
+    //         tuesday: false,
+    //         wednesday: false,
+    //         thursday: false,
+    //         friday: false,
+    //         saturday: false,
+    //         sunday: false,
+    //     },
+    // });
+
+
+    // const surveyComplete = Object.values(dateResponses.dayAnswers).some((isChecked) => isChecked);
+
     //These all save responses (I believe, copied the login logic)
     //Colby go through and manipulate these if yk how to save the responses to the database.
 
     //Prevents the user from submitting the surveyw without answering all questions
-    const surveyComplete = surveyAnswer1 && surveyAnswer2 && surveyAnswer3 && surveyAnswer4;
+    const surveyComplete = sleepHours && currentDate;
+    const handleSubmitDate = () => {
+        if(!currentDate || !sleepHours) {
+            return;
+        }
+        else {
+            setSleepByDate((prev) => ({
+                ...prev,
+                [currentDate]: sleepHours,
+            }));
+        }
+    }
 
     return (
         <div style={styles.page}>
@@ -21,32 +47,28 @@ function Survey2() {
                 <h1 style={styles.title}>Survey</h1>
                 <div style={styles.inputContainer}>
                     <div> 
-                        <label>Please enter the amount of sleep you got for each date (that you can remember):</label>
+                        <label>Select a date to enter sleep data:</label>
                     </div>
-                    <div> 
-                        <label>Enter a day of the week:</label>
-                    </div>
-                    <select 
+
+                    <label>
+                        <input
+                        type = "date"
                         value={currentDate}
-                        onChange={(e) => setCurrentDate(e.target.value)}
-                        style={styles.input}
-                    >
-                        <option value="">Select an answer</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                    </select>
-                    
-                    <div> 
-                        <label>2. How many hours of sleep do you get every night?</label>
-                    </div>
-                    <select 
-                        value={surveyAnswer2}
-                        onChange={(e) => setSurveyAnswer2(e.target.value)}
+                        onChange={(e) => {
+                            setCurrentDate(e.target.value);
+                            setSleepHours("");
+                        }}></input>
+                            
+                    </label>
+                    {currentDate && (
+                        <div>
+                            <label>How many hours of sleep did you get?</label>
+                            <br />
+                            <br />
+
+                            <select 
+                        value={sleepHours}
+                        onChange={(e) => setSleepHours(e.target.value)}
                         style={styles.input}
                     >
                         <option value="">Select an answer</option>
@@ -58,32 +80,12 @@ function Survey2() {
                         <option value="8 hours">8 hours</option>
                         <option value="9 or more hours">9 or more hours</option>
                     </select>
+                    <button style = {styles.submitButton} disabled = {!surveyComplete} onClick = {handleSubmitDate}>
 
-                    <div> 
-                        <label>3. Do you use smart devices before bed?</label>
-                    </div>
-                    <select 
-                        value={surveyAnswer3}
-                        onChange={(e) => setSurveyAnswer3(e.target.value)}
-                        style={styles.input}
-                    >
-                        <option value="">Select an answer</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
-
-                    <div> 
-                        <label>4. Do you consume caffeine at all?</label>
-                    </div>
-                    <select 
-                        value={surveyAnswer4}
-                        onChange={(e) => setSurveyAnswer4(e.target.value)}
-                        style={styles.input}
-                    >
-                        <option value="">Select an answer</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
+                    Submit Date
+                    </button>
+                        </div>
+                    )}
                 </div>
 
                 
@@ -198,6 +200,22 @@ const styles = {
     textAlign: "center",
     display: "flex",
     justifyContent: "center",
+  },
+  submitButton: {
+    backgroundColor: "#527a5c",
+    color: "white",
+    border: "none",
+    padding: "12px 24px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    cursor: "pointer",
+    width: "200px",
+    textAlign: "center",
+    justifyContent: "center",
+    display: "block",
+    marginTop: "20px",
+    marginLeft: "auto",
+    marginRight: "auto",
   }
  
 };
