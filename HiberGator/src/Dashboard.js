@@ -2,12 +2,55 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./App.css";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
 
 // Use / for login, as it is the "home page"
 
+//Basic example, need to change
+//
+function SleepGraph({sleepData}) {
+    const data = {
+        labels: sleepData.map((entry) => entry.date),
+        datasets: [
+            {
+                label: "Hours of Sleep",
+                data: sleepData.map((entry) => entry.hours),
+                backgroundColor: "rgba(38, 187, 38, 0.6)",
+                borderColor: "rgb(16, 68, 18)",
+                borderWidth: 1,
+                pointRadius: 5,
+                tension: 0.4,
+                fill: false,
+            },
+        ],
+    };
+    return <Line data={data} />;
+
+}
+
 function Dashboard() {
   const navigate = useNavigate();
+  const exampleSleepData = [
+    {date: "Mon", hours: 6 },
+    {date: "Tue", hours: 7 },
+    {date: "Wed", hours: 6 },
+    {date: "Thu", hours: 7 },
+    {date: "Fri", hours: 6 },
+    {date: "Sat", hours: 7 },
+    {date: "Sun", hours: 6 },
+  ];
 
 
   
@@ -21,12 +64,10 @@ function Dashboard() {
         </p>
 
         <div style={styles.grid}>
-
           <div style={styles.card}>
             <h2 style={styles.cardTitle}>Sleep History</h2>
-            <p style={styles.cardText}>Placeholder</p>
+            <SleepGraph sleepData={exampleSleepData} />
           </div>
-
         </div>
 
         <div style={styles.buttonContainer}>
@@ -48,7 +89,6 @@ function Dashboard() {
           </button>
         </div>
 
-        
         </div>
       </div>
   );
@@ -162,7 +202,6 @@ const styles = {
     textAlign: "center",
     width: "100px",
   }
-
 };
 
 export default Dashboard;
